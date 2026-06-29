@@ -11,7 +11,7 @@ Claude Code skills by VGX Global Consulting. Install once, use across every proj
 ### Mac / Linux
 
 ```bash
-git clone https://github.com/vgx-global/vgx-skills.git
+git clone https://github.com/VGXDigital/vgx-skills.git
 cd vgx-skills
 bash install.sh
 ```
@@ -19,7 +19,7 @@ bash install.sh
 ### Windows (PowerShell)
 
 ```powershell
-git clone https://github.com/vgx-global/vgx-skills.git
+git clone https://github.com/VGXDigital/vgx-skills.git
 cd vgx-skills
 .\install.ps1
 ```
@@ -35,6 +35,7 @@ Pull latest and re-run the installer:
 ```bash
 # Mac / Linux
 git pull && bash install.sh
+
 
 # Windows
 git pull; .\install.ps1
