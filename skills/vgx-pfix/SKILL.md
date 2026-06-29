@@ -1,118 +1,74 @@
 ---
 name: vgx-pfix
-description: VGX Prompt Fix — diagnose and fix a developer prompt against the 5-Part Formula (Context, Existing Code, Request, Constraints, Output Format). Flags missing or weak parts, rewrites the prompt. Use when asked to "fix my prompt", "pfix", "vgx-pfix", "diagnose this prompt", "improve this prompt", "check my prompt", or "/vgx-pfix".
-triggers:
-  - fix my prompt
-  - pfix
-  - vgx-pfix
-  - diagnose this prompt
-  - improve this prompt
-  - check my prompt
-  - review this prompt
-  - is this a good prompt
+description: This skill should be used when the user asks to "fix my prompt", "check my prompt", "diagnose this prompt", "improve this prompt", "is this a good prompt", "pfix", or "/vgx-pfix". Diagnoses a developer prompt against the VGX 5-Part Formula, flags prompting traps, and rewrites the prompt to fix every issue found.
+version: 1.0.0
 ---
 
 <!-- © 2026 VGX Global Consulting (OPC) Pvt Ltd. All rights reserved. -->
 
-# /vgx-pfix — VGX Prompt Fix
+# vgx-pfix — VGX Prompt Fix
 
-Diagnose a developer prompt against the 5-Part Formula. Score each part, flag prompting traps, verdict, rewrite.
+Diagnose a developer prompt against the 5-Part Formula. Score each part, flag prompting traps, deliver a verdict, rewrite.
 
-**You are not correcting what the developer is building. You are correcting how they communicated it to Claude.**
-
----
-
-## The 5-Part Formula
-
-| Part | What it provides | Missing when... |
-|---|---|---|
-| **1. Context** | Project, stack, current state, what's NOT in scope | Claude produces generic code that doesn't fit the project |
-| **2. Existing Code** | File or function Claude should match | Claude invents structure instead of matching what's there |
-| **3. Request** | Specific thing to do, scoped and bounded | Claude over-builds, goes too broad, or misunderstands the task |
-| **4. Constraints** | Library choices, naming, patterns, security rules, what NOT to change | Claude ignores conventions, uses wrong libraries, violates rules |
-| **5. Output Format** | How the response should be shaped | Claude wraps code in explanation, returns whole file when you wanted a snippet |
-
-**Key insight:** The Request is typically the *smallest* part. Context + Existing Code + Constraints do most of the work.
+The goal is not to correct what the developer is building — it is to correct how they communicated it to Claude.
 
 ---
 
-## The 5-Second Check
+## Before Starting
 
-Run these before hitting enter on any prompt:
-
-1. Does Claude know what project this is?
-2. Did I show it a reference file?
-3. Is my ask one specific, scoped thing?
-4. Did I state rules that aren't obvious?
-5. Did I say what I DON'T want?
-
----
-
-## The Ten Prompting Traps
-
-Flag by number and name when they apply.
-
-1. **No Existing Code** — asking for new code without showing existing patterns → Claude invents structure
-2. **Missing Multi-Tenant Fact** — not stating per-user scoping when it applies → Claude ignores ownership checks
-3. **Literal Words** — under-specifying shape constraints → Claude picks a shape the codebase doesn't use
-4. **Stale Plan** — prompt written from memory of an earlier plan, not current code → drift
-5. **Didn't Read the Answer** — Claude stated assumptions; developer missed them
-6. **Vague Debugging** — pasted only the error, not the function, file, or context
-7. **Hallucinated Library** — asked for something using a library that isn't installed
-8. **Trusted the SQL** — assumed correct SQL for aggregation/dates/money without verifying
-9. **Regenerate Not Iterate** — restarted from scratch instead of refining the response
-10. **Unbounded Scope** — didn't tell Claude what NOT to touch → Claude refactors unrelated code
+Load `references/formula.md` before diagnosing any prompt. It contains the full 5-Part Formula table, 10 traps with descriptions, scoring definitions, verdict thresholds, and the analysis-task adaptation.
 
 ---
 
 ## Process
 
-### Step 1 — Read the prompt
+### Step 1 — Receive the prompt
 
-Analyse immediately. No clarifying questions first.
+Analyse immediately. Do not ask clarifying questions first.
 
-If no prompt supplied: "Paste the prompt you want diagnosed."
+If no prompt was supplied: output one sentence — "Paste the prompt you want diagnosed."
 
 ### Step 2 — Score each part
 
-PRESENT / WEAK / MISSING with one-line reason each.
+Assign PRESENT / WEAK / MISSING to each of the five parts. Use the scoring definitions in `references/formula.md`. Write one specific sentence explaining each score — not what the part is, but why this prompt's version of it is scored that way.
 
-### Step 3 — Identify trap matches
+For analysis or audit prompts (no code generation involved), apply the analysis-task adaptation from `references/formula.md` when scoring Existing Code.
 
-One line per trap: number, name, why it applies.
+### Step 3 — Identify triggered traps
 
-### Step 4 — Diagnosis report
+Check the prompt against all ten traps in `references/formula.md`. Flag every match. One line per trap: number, name, one sentence on why it applies.
+
+### Step 4 — Output the diagnosis report
 
 ```
 ## Prompt Diagnosis
 
 ### Part Scores
-- Context: [PRESENT | WEAK | MISSING] — [one-line reason]
-- Existing Code: [PRESENT | WEAK | MISSING] — [one-line reason]
-- Request: [PRESENT | WEAK | MISSING] — [one-line reason]
-- Constraints: [PRESENT | WEAK | MISSING] — [one-line reason]
-- Output Format: [PRESENT | WEAK | MISSING] — [one-line reason]
+- Context: [PRESENT | WEAK | MISSING] — [reason]
+- Existing Code: [PRESENT | WEAK | MISSING] — [reason]
+- Request: [PRESENT | WEAK | MISSING] — [reason]
+- Constraints: [PRESENT | WEAK | MISSING] — [reason]
+- Output Format: [PRESENT | WEAK | MISSING] — [reason]
 
 ### Traps Triggered
-[trap number + name: one-line explanation, or "None detected"]
+[trap number — trap name: one-line explanation]
+[or: None detected]
 
 ### Verdict
 [STRONG | NEEDS WORK | WEAK]
 ```
 
-STRONG = all 5 parts present (or absent for good reason), no traps  
-NEEDS WORK = 1–2 parts weak/missing or 1–2 traps  
-WEAK = 3+ parts missing or 3+ traps
+Use verdict thresholds from `references/formula.md`.
 
-### Step 5 — Rewrite
+### Step 5 — Rewrite the prompt
 
-Fixed version addressing every WEAK/MISSING part and every triggered trap.
+Produce a fixed version that addresses every WEAK or MISSING part and neutralises every triggered trap.
 
-Rules:
-- Keep the developer's intent exactly
-- Use `[PLACEHOLDER]` only where the actual value is unknowable
-- Do not pad — only add what was genuinely missing
-- Rewrite must pass the 5-second check
+Rewrite rules:
+- Keep the developer's intent exactly — do not change what they are trying to build
+- Use `[PLACEHOLDER]` only where the actual value is genuinely unknowable (e.g. file paths not provided)
+- Do not pad — add only what was genuinely missing
+- The rewrite must pass the 5-second check from `references/formula.md`
 
 ```
 ## Fixed Prompt
@@ -120,19 +76,27 @@ Rules:
 [rewritten prompt, ready to paste into Claude Code]
 
 ## What Changed
-- [bullet: what was added or strengthened and why]
+- [bullet per change: what was added or strengthened and why]
 ```
 
-### Step 6 — Teaching note (optional)
+### Step 6 — Teaching note (conditional)
 
-If the diagnosis reveals a repeating pattern (always skips Existing Code, always vague on constraints), add 2–3 sentences max. Only if there is a clear pattern. Do not lecture.
+Add a teaching note only when the diagnosis reveals a clear repeating pattern — for example, Existing Code is always skipped, or Constraints are consistently absent. Two to three sentences maximum. Skip this step entirely if no pattern is visible.
 
 ---
 
-## Tone and Output Rules
+## Output Rules
 
-- Direct, senior-dev PR review. Specific, not harsh.
-- No praise for PRESENT parts — note them and move on.
-- No padding, no pleasantries.
-- Fixed prompt must be immediately usable.
-- Never change what the developer is trying to build.
+- Diagnose like a senior developer reviewing a junior's PR: direct, specific, not harsh
+- Note PRESENT parts with their score and move on — no praise
+- No padding, no pleasantries, no filler
+- Fixed prompt must be immediately usable — minimal placeholders
+- Never change what the developer is trying to build
+
+---
+
+## Additional Resources
+
+### Reference Files
+
+- **`references/formula.md`** — 5-Part Formula table, 5-second check, 10 traps with detail, scoring definitions, verdict thresholds, analysis-task adaptation
