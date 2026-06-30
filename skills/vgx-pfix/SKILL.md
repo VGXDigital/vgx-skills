@@ -71,7 +71,7 @@ Rewrite rules:
 - The rewrite must pass the 5-second check from `references/formula.md`
 
 ```
-## Fixed Prompt
+## Suggested Prompt
 
 [rewritten prompt, ready to paste into Claude Code]
 
