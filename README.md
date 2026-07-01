@@ -11,18 +11,18 @@ Claude Code skills by VGX Global Consulting. Install once, use across every proj
 ### Mac / Linux
 
 ```bash
-git clone https://github.com/VGXDigital/vgx-skills.git
-cd vgx-skills
-bash install.sh
+curl -fsSL https://raw.githubusercontent.com/VGXDigital/vgx-skills/main/install.sh | bash
 ```
 
-### Windows (PowerShell)
+### Windows
+
+Open PowerShell and paste:
 
 ```powershell
-git clone https://github.com/VGXDigital/vgx-skills.git
-cd vgx-skills
-.\install.ps1
+irm https://raw.githubusercontent.com/VGXDigital/vgx-skills/main/install.ps1 | iex
 ```
+
+No git required — the script downloads the current skills straight from GitHub and installs them.
 
 Restart Claude Code after install (or reload the VS Code window).
 
@@ -30,18 +30,7 @@ Restart Claude Code after install (or reload the VS Code window).
 
 ## Updating
 
-Pull latest and re-run the installer:
-
-```bash
-# Mac / Linux
-git pull && bash install.sh
-
-
-# Windows
-git pull; .\install.ps1
-```
-
-The installer overwrites existing skills — safe to run repeatedly.
+The installer overwrites existing skills — just re-run the same one-liner from above.
 
 ---
 
@@ -69,8 +58,9 @@ Each skill is a single `SKILL.md` file. To inspect what a skill does before runn
 
 This repo is the distribution point for VGX masterclass skills. To add a new skill:
 
-1. Create `skills/<skill-name>/SKILL.md`
-2. Add a row to the Skills table above
-3. Commit and push — participants re-run the installer to get it
+1. Create `skills/<skill-name>/SKILL.md` (and any reference files it needs)
+2. Add a `mkdir`/`curl` (or `New-Item`/`Invoke-WebRequest`) line per file to install.sh and install.ps1
+3. Add a row to the Skills table above
+4. Commit and push — participants re-run the installer to get it
 
 Skills are scoped to the user's machine (global install), so they work in any project the participant opens in Claude Code.

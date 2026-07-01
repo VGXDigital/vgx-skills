@@ -1,29 +1,21 @@
 #!/usr/bin/env bash
-# © 2026 VGX Global Consulting (OPC) Pvt Ltd. All rights reserved.
-# install.sh — install VGX Claude Code skills into ~/.claude/skills/
+# (c) 2026 VGX Global Consulting (OPC) Pvt Ltd. All rights reserved.
+# install.sh - install VGX Claude Code skills into ~/.claude/skills/
+# Fetches each skill file directly from GitHub. No git binary or clone required.
 
-set -e
+set -euo pipefail
+BASE="https://raw.githubusercontent.com/VGXDigital/vgx-skills/main/skills"
+DEST="$HOME/.claude/skills"
 
-SKILLS_SRC="$(cd "$(dirname "$0")/skills" && pwd)"
-SKILLS_DEST="$HOME/.claude/skills"
-
-echo "VGX Claude Masterclass — Skill Installer"
-echo "Installing from: $SKILLS_SRC"
-echo "Installing to:   $SKILLS_DEST"
+echo "VGX Claude Masterclass - Skill Installer"
+echo "Installing to: $DEST"
 echo ""
 
-mkdir -p "$SKILLS_DEST"
-
-installed=0
-for skill_dir in "$SKILLS_SRC"/*/; do
-  skill_name="$(basename "$skill_dir")"
-  dest="$SKILLS_DEST/$skill_name"
-  mkdir -p "$dest"
-  cp "$skill_dir/SKILL.md" "$dest/SKILL.md"
-  echo "  ✓ $skill_name"
-  installed=$((installed + 1))
-done
+mkdir -p "$DEST/vgx-pfix/references"
+curl -fsSL "$BASE/vgx-pfix/SKILL.md" -o "$DEST/vgx-pfix/SKILL.md"
+curl -fsSL "$BASE/vgx-pfix/references/formula.md" -o "$DEST/vgx-pfix/references/formula.md"
+echo "  + vgx-pfix"
 
 echo ""
-echo "Done. $installed skill(s) installed."
+echo "Done. 1 skill(s) installed."
 echo "Restart Claude Code (or reload the window) to activate."
